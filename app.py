@@ -29,24 +29,6 @@ def index():
     return render_template("index.html")
 
 @app.route("/add", methods=["POST"])
-def add_todo():
-    # Get the data from the form
-    todo = Todo(
-        name=request.form["todo"]
-    )
-    # Add the new ToDo to the list
-    db.session.add(todo)
-    db.session.commit()
-    
-    # Add the new ToDo to the list
-    return redirect(url_for('index'))
+sdfdsfsdfslol;sdfsd
 
-# Delete a ToDo
-@app.route('/remove/<int:id>', methods=['GET', "POST"])
-def remove_todo(id):
-    db.session.delete(Todo.query.filter_by(id=id).first())
-    db.session.commit()
-    return redirect(url_for('index'))
-
-if __name__ == "__main__":
-    app.run(debug=True)
+sdlfksdfsdfk
