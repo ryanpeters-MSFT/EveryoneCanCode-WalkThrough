@@ -1,57 +1,52 @@
-todo_list = []
+###############################################################################
+## Sprint 3: Database Integration
+## Feature 2: Persist To-Do List
+## User Story 2: Load To-Do List
+###############################################################################
+import os
+from flask import Flask, render_template, request, redirect, url_for, g
+from database import db, Todo
 
-# load the to-do list from a file
-try:
-    with open("todo_list.txt", "r") as file:
-        for line in file:
-            todo_list.append(line.strip())
-except FileNotFoundError:
-    # ignore the error if the file does not exist, simply start with an empty list
-    print("No saved items found") 
+app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))   # Get the directory of the this file
+todo_file = os.path.join(basedir, 'todo_list.txt')     # Create the path to the to-do list file using the directory
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///' + os.path.join(basedir, 'todos.db')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# continue to loop and display menu until user selects to exit the program
-while True:
-    print() # add a couple of blank lines
-    print()
-    print("To-do list: ") # print the title of the list
-    item_number = 1
-    for todo in todo_list: # loop through existing to-do items
-        print(f'{item_number}: {todo}')
-        item_number += 1
+db.init_app(app)
 
-# print the menu
-    print() # Add a of blank lines
-    print("Actions:")
-    print("A - Add to-do item")
-    print("R - Remove to-do item")
-    print("X - Exit")
-    choice = input("Enter your choice (A, R, or X): ")
-    choice = choice.upper() # converts the choice to uppercase
+with app.app_context():
+    db.create_all()
 
-    # user selected 'a' or 'A' to add an item to the list
-    if choice == "A":
-        todo = input("Enter the to-do item: ")
-        todo_list.append(todo)
-        continue  # tells the program to go back to the start of the loop
+@app.before_request
+def load_data_to_g():
+    todos = Todo.query.all()
+    g.todos = todos 
+    g.todo = None
 
-    # user selected 'r' or 'R' - To Remove an item from the list
-    if choice == "R":
-        item_number = int(input("Enter the number of the item to remove: "))
-        if item_number > 0 and item_number <= len(todo_list):
-            todo_list.pop(item_number - 1)
-        else:
-            print("Invalid item number")
-        continue
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-    # user 1 selected 'x' or 'X' to exit program
-    if choice == "X":
-        # on exit save your current list to a file
-        print("Saving to-do list to file")
-        with open("todo_list.txt", "w") as file:
-            for todo in todo_list:
-                file.write(todo + "\n")
+@app.route("/add", methods=["POST"])
+def add_todo():
+    # Get the data from the form
+    todo = Todo(
+        name=request.form["todo"]
+    )
+    # Add the new ToDo to the list
+    db.session.add(todo)
+    db.session.commit()
+    
+    # Add the new ToDo to the list
+    return redirect(url_for('index'))
 
-        break # tells the program to exit the loop
+# Delete a ToDo
+@app.route('/remove/<int:id>', methods=['GET', "POST"])
+def remove_todo(id):
+    db.session.delete(Todo.query.filter_by(id=id).first())
+    db.session.commit()
+    return redirect(url_for('index'))
 
-    #user selected something else
-    print("Invalid choice")
+if __name__ == "__main__":
+    app.run(debug=True)
