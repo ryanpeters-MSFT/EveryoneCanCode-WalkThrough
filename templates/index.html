@@ -23,14 +23,15 @@
                 <form>
                     <ol class="list-group">
                         {% for todo in g.todos %}
-                        <li id="task-{{ todo.id }}" data-id="{{ todo.id }}"
-                            class="list-group-item d-flex justify-content-between">
+                        <li id="task-{{ todo.id }}" data-id="{{ todo.id }}" class="list-group-item d-flex justify-content-between" onclick="showDetails(this)">
                             <div class="task">
                                 <div class="form-check">
                                     {% if todo.completed %}
-                                    <input class="form-check-input" type="checkbox" id="{{ todo.id }}" checked onclick="handleClick(event, this)">
+                                    <input class="form-check-input" type="checkbox" id="{{ todo.id }}" checked
+                                        onclick="handleClick(event, this)">
                                     {% else %}
-                                    <input class="form-check-input" type="checkbox" id="{{ todo.id }}" onclick="handleClick(event, this)">
+                                    <input class="form-check-input" type="checkbox" id="{{ todo.id }}"
+                                        onclick="handleClick(event, this)">
                                     {% endif %}
 
                                     <div class="title" id="title-{{ todo.id }}">{{ todo.name }}</div>
@@ -48,16 +49,7 @@
                                 </div>
                             </div>
                             <span>
-                                <button type="submit" class="btn btn-success"
-                                    formaction="{{ url_for('details', id=todo.id) }}" formmethod="GET">Details</button>
-                                <button type="submit" class="btn btn-success"
-                                    formaction="{{ url_for('edit', id=todo.id) }}" formmethod="GET">Edit</button>
-                                <button type="submit" class="btn btn-success"
-                                    formaction="{{ url_for('recommend', id=todo.id) }}"
-                                    formmethod="GET">Recommendations</button>
-                                <button type="submit" class="btn btn-danger"
-                                    formaction="{{ url_for('remove_todo', id=todo.id) }}"
-                                    formmethod="POST">Remove</button>
+                                <button type="submit" class="btn btn-danger" formaction="{{ url_for('remove_todo', id=todo.id) }}" formmethod="POST">Remove</button>
                             </span>
                         </li>
                         {% endfor %}
@@ -82,12 +74,25 @@
                             </svg>
                             <span class="visually-hidden" title="Use Microphone"></span>
                         </button>
-                        <button type="submit" class="btn btn-success">Add</button>
+                        <button type="submit" onclick="clearHighlight()" class="btn btn-success">Add</button>
                     </span>
                 </form>
 
             </div>
             <div class="col-5">
+                {% if g.selectedTab != g.TabEnum.NONE %}
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a id="details-tab" class="nav-link" aria-current="page" href="{{ url_for('details', id=g.todo.id) }}">Details</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="edit-tab" class="nav-link" href="{{ url_for('edit', id=g.todo.id) }}">Edit</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="recommendations-tab" class="nav-link" href="{{ url_for('recommend', id=g.todo.id) }}">Recommendations</a>
+                    </li>
+                </ul>
+                {% endif %}
                 {% if g.todo != None and g.selectedTab == g.TabEnum.RECOMMENDATIONS %}
                 <div id="recommendations-div" class="card">
                     <div class="card-body">
