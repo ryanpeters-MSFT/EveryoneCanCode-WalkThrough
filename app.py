@@ -112,7 +112,7 @@ def update_todo(id):
 
 
 # Delete a ToDo
-@app.route('/remove/<int:id>', methods=["POST"])
+@app.route('/remove/<int:id>', methods=["GET"])
 def remove_todo(id):
     db.session.delete(Todo.query.filter_by(id=id).first())
     db.session.commit()

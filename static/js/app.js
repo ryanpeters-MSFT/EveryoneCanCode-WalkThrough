@@ -104,18 +104,36 @@ document.addEventListener("DOMContentLoaded", function () {
         localStorage.setItem(HIGHLIGHTEDITEM, closestListItem.id);
     };
 
-    nameInput.addEventListener("keyup", function() {
+    nameInput.addEventListener("keyup", function () {
         const addButton = document.querySelector("button[id='addButton']");
         addButton.disabled = this.value.trim() === "";
     });
 
-    recognition.onresult = function(event) {
+    recognition.onresult = function (event) {
         const transcript = event.results[0][0].transcript;
         const recognizedText = transcript.endsWith('.') ? transcript.slice(0, -1) : transcript;
         nameInput.value = recognizedText;
-    
+
         const addButton = document.querySelector("button[id='addButton']");
         addButton.disabled = false;
     };
+
+    const myModal = document.getElementById('confirmModal')
+    const deleteButtons = document.getElementsByClassName('delete-btn');
+    Array.from(deleteButtons).forEach((deleteButton) => {
+        deleteButton.addEventListener('click', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            const url = this.getAttribute('data-url');
+            document.getElementById('deleteLink').setAttribute('href', url);
+            const taskname_paragraph = document.querySelector("p[id='taskName']");
+            const taskname = this.getAttribute('data-taskname');
+            taskname_paragraph.textContent = taskname;
+            myModal.addEventListener('shown.bs.modal', () => {
+                deleteButton.focus()
+            })
+            clearHighlight();
+        });
+    });
 });
 
