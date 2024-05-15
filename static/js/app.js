@@ -103,4 +103,19 @@ document.addEventListener("DOMContentLoaded", function () {
 
         localStorage.setItem(HIGHLIGHTEDITEM, closestListItem.id);
     };
+
+    nameInput.addEventListener("keyup", function() {
+        const addButton = document.querySelector("button[id='addButton']");
+        addButton.disabled = this.value.trim() === "";
+    });
+
+    recognition.onresult = function(event) {
+        const transcript = event.results[0][0].transcript;
+        const recognizedText = transcript.endsWith('.') ? transcript.slice(0, -1) : transcript;
+        nameInput.value = recognizedText;
+    
+        const addButton = document.querySelector("button[id='addButton']");
+        addButton.disabled = false;
+    };
 });
+
